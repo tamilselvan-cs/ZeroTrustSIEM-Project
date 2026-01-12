@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>IT Admin Console</title>
+    <style>
+        body { background: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; padding: 30px; }
+        .nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #334155; padding-bottom: 20px; }
+        .card { background: #1e293b; padding: 25px; border-radius: 10px; margin-bottom: 25px; border: 1px solid #334155; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #334155; }
+        th { color: #94a3b8; }
+        input, select { padding: 10px; background: #334155; border: 1px solid #475569; color: white; border-radius: 5px; }
+        .btn { background: #3b82f6; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; }
+        .status { padding: 5px 10px; border-radius: 20px; font-size: 0.8em; font-weight: bold; }
+        .status-paid { background: #064e3b; color: #6ee7b7; }
+        .status-pending { background: #1e3a8a; color: #93c5fd; }
+        .status-overdue { background: #450a0a; color: #fca5a5; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <h1>🛡️ IT Admin Console</h1>
+        <div>
+            <span>Operator: {{ user }}</span>
+            <a href="/logout" style="color: #fca5a5; margin-left: 20px; text-decoration: none;">Logout</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>➕ Onboard New Employee</h3>
+        <form action="/add_user" method="POST" style="display: flex; gap: 10px;">
+            <input type="text" name="new_username" placeholder="Username" required>
+            <input type="text" name="new_password" placeholder="Password" required>
+            <select name="new_dept">
+                <option>HR</option><option>Finance</option><option>Engineering</option><option>Sales</option>
+            </select>
+            <button class="btn">Create Account</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>📊 Active Projects</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Project Name</th><th>Deadline</th><th>Budget</th><th>Expenses</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for p in projects %}
+                <tr>
+                    <td>{{ p.id }}</td>
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.deadline }}</td>
+                    <td>{{ p.budget }}</td>
+                    <td>{{ p.expenses }}</td>
+                    <td>{{ p.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>💰 Payment Ledger</h3>
+        <table>
+            <thead><tr><th>Invoice ID</th><th>Project</th><th>Vendor</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td>{{ p.id }}</td>
+                    <td>{{ p.project }}</td>
+                    <td>{{ p.vendor }}</td>
+                    <td>{{ p.amount }}</td>
+                    <td><span class="status status-{{ p.status|lower }}">{{ p.status }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

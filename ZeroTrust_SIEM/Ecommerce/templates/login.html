@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SecureCorp | Login</title>
+    <style>
+        body { background-color: #f1f5f9; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; margin: 0; }
+        .split-left { flex: 1; background: #0f172a; color: white; display: flex; flex-direction: column; justify-content: center; padding: 60px; }
+        .split-right { flex: 1.5; background: white; display: flex; align-items: center; justify-content: center; }
+        .login-box { width: 400px; padding: 40px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #cbd5e1; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #0f172a; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 5px; text-align: center; }
+        .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .alert-success { background: #dcfce7; color: #166534; }
+    </style>
+</head>
+<body>
+    <div class="split-left">
+        <h1 style="color: #38bdf8;">SecureCorp Inc.</h1>
+        <h2>Enterprise Access Portal</h2>
+        <p>Authorized personnel only. All access is monitored.</p>
+        <p style="margin-top: 20px; font-size: 0.9em; color: #94a3b8;">Current Gateway: {{ vpn_loc }}</p>
+    </div>
+    <div class="split-right">
+        <div class="login-box">
+            <h2 style="text-align: center; color: #334155;">Sign In</h2>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form action="/login" method="POST">
+                <label>Corporate ID</label>
+                <input type="text" name="username" required>
+                <label>Password</label>
+                <input type="password" name="password" required>
+                <button type="submit">Authenticate</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

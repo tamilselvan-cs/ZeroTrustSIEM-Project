@@ -1,0 +1,10 @@
+flask
+pymongo
+customtkinter
+tkintermapview
+matplotlib
+pandas
+faker
+pillow
+scikit-learn
+packaging

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SecureConnect VPN</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .vpn-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; }
+        .status-display { text-align: center; padding: 30px; }
+        .big-icon { font-size: 5rem; margin-bottom: 1rem; display: block; }
+        .ip-display { 
+            font-family: monospace; background: #f1f5f9; color: #334155; 
+            padding: 8px 15px; border-radius: 6px; font-weight: bold; border: 1px solid #cbd5e1; display: inline-block; margin-top: 10px; 
+        }
+        .ping-indicator { height: 8px; width: 8px; background-color: #22c55e; border-radius: 50%; display: inline-block; margin-right: 5px; }
+    </style>
+    
+    <script>
+        function switchServer(locKey) {
+            // UI Feedback
+            const buttons = document.querySelectorAll('.connect-btn');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = "0.6";
+                if(btn.id === `btn-${locKey}`) btn.innerText = "Connecting...";
+            });
+
+            // API Call
+            const formData = new FormData();
+            formData.append('location', locKey);
+
+            fetch('/set_vpn', { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Update Status
+                    document.getElementById('display-country').innerText = data.location;
+                    document.getElementById('display-ip').innerText = data.ip;
+                    
+                    // Reset Buttons
+                    buttons.forEach(btn => {
+                        btn.disabled = false;
+                        btn.style.opacity = "1";
+                        btn.innerText = "Connect";
+                        btn.style.backgroundColor = "#0ea5e9"; 
+                    });
+
+                    // Set Active Button
+                    const activeBtn = document.getElementById(`btn-${locKey}`);
+                    activeBtn.innerText = "Connected";
+                    activeBtn.style.backgroundColor = "#22c55e"; 
+                    activeBtn.disabled = true;
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <nav>
+        <h1>🔐 SecureConnect VPN</h1>
+        <div>
+            <a href="{{ url_for('index') }}">Back to App</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="vpn-grid">
+            
+            <div class="card status-display">
+                <h3 class="section-title">📡 Connection Status</h3>
+                <div style="margin-top: 40px;">
+                    <span class="big-icon">🌐</span>
+                    <h2 id="display-country" style="color: #0f172a; font-size: 2rem;">{{ locations[current_loc]['country'] }}</h2>
+                    <div class="ip-display">IP: <span id="display-ip">{{ locations[current_loc]['ip'] }}</span></div>
+                    <div class="alert alert-success" style="margin-top: 30px;">
+                        🔒 <strong>AES-256 Encryption</strong><br>Tunnel Active • 0 Leak Detected
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">🌍 Select Gateway</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Region</th>
+                            <th>Public IP Address</th>
+                            <th>Latency</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, info in locations.items() %}
+                        <tr>
+                            <td style="font-weight: 700;">
+                                {% if key == 'USA' %}🇺🇸{% elif key == 'Russia' %}🇷🇺{% elif key == 'China' %}🇨🇳{% elif key == 'Nigeria' %}🇳🇬{% endif %}
+                                {{ info.country }}
+                            </td>
+                            <td style="font-family: monospace; color: #64748b;">{{ info.ip }}</td>
+                            <td><span class="ping-indicator"></span>~45ms</td>
+                            <td style="width: 140px;">
+                                <button 
+                                    id="btn-{{ key }}" 
+                                    class="connect-btn"
+                                    onclick="switchServer('{{ key }}')"
+                                    style="padding: 8px 15px; font-size: 0.9rem; {% if current_loc == key %}background-color: #22c55e; cursor: default;{% endif %}"
+                                    {% if current_loc == key %}disabled{% endif %}
+                                >
+                                    {% if current_loc == key %}Connected{% else %}Connect{% endif %}
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
